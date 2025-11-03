@@ -1,7 +1,7 @@
 console.log("loading: main.js");
 
 import * as THREE from "three";
-import { generateForest } from "./ForestGenerator";
+import { generateForest, seasons } from "./ForestGenerator";
 
 // Scene Setup
 const scene = new THREE.Scene();
@@ -35,7 +35,13 @@ const ground = new THREE.Mesh(planeGeometry, planeMaterial);
 ground.rotation.x = -Math.PI / 2;
 scene.add(ground);
 
-generateForest(scene);
+const leafMeshes = generateForest(scene, 0);
+
+// Seasons
+let currentSeasonIndex = 0;
+let nextSeasonIndex = 1;
+let transitionStart = Date.now();
+const transitionDuration = 60000;
 
 // WASD Movement
 const keys = { w: false, a: false, s: false, d: false };
@@ -125,6 +131,22 @@ function animate() {
       target.x = newTargetX;
     }
   }
+
+  // Seasons
+  const now = Date.now();
+  let blend = (now - transitionStart) / transitionDuration;
+  if (blend >= 1) {
+    currentSeasonIndex = nextSeasonIndex;
+    nextSeasonIndex = (nextSeasonIndex + 1) % 4;
+    transitionStart = now;
+    blend = 0;
+  }
+  leafMeshes.forEach((leaf) => {
+    const idx = leaf.userData.leafIndex;
+    const currentColor = seasons[currentSeasonIndex][idx].color;
+    const nextColor = seasons[nextSeasonIndex][idx].color;
+    leaf.material.color.copy(currentColor).lerp(nextColor, blend);
+  });
 
   camera.lookAt(target);
   renderer.render(scene, camera);
