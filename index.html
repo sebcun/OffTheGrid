@@ -8,6 +8,18 @@
   </head>
   <body>
     <canvas id="gameCanvas"></canvas>
+    <div id="ui">
+      <div id="hotbar">
+        <div class="slot wood-slot" id="wood-slot">
+          <img src="img/wood.png" alt="Wood" class="item-icon" />
+          <div class="stack-amount" id="wood-balance">0</div>
+        </div>
+        <div class="slot stone-slot" id="stone-slot">
+          <img src="img/stone.png" alt="Stone" class="item-icon" />
+          <div class="stack-amount" id="stone-balance">0</div>
+        </div>
+      </div>
+    </div>
     <script type="module" src="scripts/main.js"></script>
   </body>
 </html>

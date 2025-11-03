@@ -3,6 +3,9 @@ console.log("loading: main.js");
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { generateForest, seasons } from "./ForestGenerator";
+import { balances, saveBalances, updateBalancesDisplay } from "./Balances";
+
+updateBalancesDisplay();
 
 // Scene Setup
 const scene = new THREE.Scene();
@@ -55,6 +58,10 @@ const planeMaterial = new THREE.MeshBasicMaterial({ color: 0x228b22 });
 const ground = new THREE.Mesh(planeGeometry, planeMaterial);
 ground.rotation.x = -Math.PI / 2;
 scene.add(ground);
+
+const gridHelper = new THREE.GridHelper(100, 100, 0x1d691d, 0x1d691d);
+gridHelper.position.y = 0.01;
+scene.add(gridHelper);
 
 const leafMeshes = generateForest(scene, 0);
 
@@ -179,6 +186,8 @@ function animate() {
     const nextColor = seasons[nextSeasonIndex][idx].color;
     leaf.material.color.copy(currentColor).lerp(nextColor, blend);
   });
+
+  updateBalancesDisplay();
 
   renderer.render(scene, camera);
 }
