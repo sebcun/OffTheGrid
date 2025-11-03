@@ -1,6 +1,7 @@
 console.log("loading: main.js");
 
 import * as THREE from "three";
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { generateForest, seasons } from "./ForestGenerator";
 
 // Scene Setup
@@ -26,6 +27,26 @@ const renderer = new THREE.WebGLRenderer({
 });
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+// Controls
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.target.copy(target);
+controls.enableDamping = true;
+controls.dampingFactor = 0.05;
+controls.enableZoom = false;
+controls.enablePan = false;
+controls.enableRotate = true;
+controls.maxDistance = 20;
+
+controls.addEventListener("change", () => {
+  const distance = camera.position.distanceTo(controls.target);
+  if (distance > 20) {
+    camera.position.sub(controls.target).setLength(20).add(controls.target);
+  }
+  if (controls.target.length() > 20) {
+    controls.target.setLength(20);
+  }
+});
 
 // Grid/Floor
 const planeGeometry = new THREE.PlaneGeometry(100, 100);
@@ -67,8 +88,10 @@ window.addEventListener("keyup", (e) => {
 function animate() {
   requestAnimationFrame(animate);
 
+  controls.update();
+
   const forward = new THREE.Vector3()
-    .subVectors(target, camera.position)
+    .subVectors(controls.target, camera.position)
     .normalize();
   const right = new THREE.Vector3().crossVectors(up, forward).normalize();
 
@@ -76,7 +99,7 @@ function animate() {
 
   if (keys.w) {
     const direction = new THREE.Vector3()
-      .subVectors(camera.position, target)
+      .subVectors(camera.position, controls.target)
       .normalize();
     const newCamPos = camera.position
       .clone()
@@ -85,9 +108,10 @@ function animate() {
       camera.position.copy(newCamPos);
     }
   }
+
   if (keys.s) {
     const direction = new THREE.Vector3()
-      .subVectors(camera.position, target)
+      .subVectors(camera.position, controls.target)
       .normalize();
     const newCamPos = camera.position
       .clone()
@@ -99,36 +123,44 @@ function animate() {
 
   if (keys.a) {
     const newCamX = camera.position.x + right.x * moveSpeed;
-    const newTargetX = target.x + right.x * moveSpeed;
+    const newTargetX = controls.target.x + right.x * moveSpeed;
     const newCamPos = new THREE.Vector3(
       newCamX,
       camera.position.y,
       camera.position.z
     );
-    const newTargetPos = new THREE.Vector3(newTargetX, target.y, target.z);
+    const newTargetPos = new THREE.Vector3(
+      newTargetX,
+      controls.target.y,
+      controls.target.z
+    );
     if (
       newCamPos.length() <= maxDistance &&
       newTargetPos.length() <= maxDistance
     ) {
       camera.position.x = newCamX;
-      target.x = newTargetX;
+      controls.target.x = newTargetX;
     }
   }
   if (keys.d) {
     const newCamX = camera.position.x + right.x * -moveSpeed;
-    const newTargetX = target.x + right.x * -moveSpeed;
+    const newTargetX = controls.target.x + right.x * -moveSpeed;
     const newCamPos = new THREE.Vector3(
       newCamX,
       camera.position.y,
       camera.position.z
     );
-    const newTargetPos = new THREE.Vector3(newTargetX, target.y, target.z);
+    const newTargetPos = new THREE.Vector3(
+      newTargetX,
+      controls.target.y,
+      controls.target.z
+    );
     if (
       newCamPos.length() <= maxDistance &&
       newTargetPos.length() <= maxDistance
     ) {
       camera.position.x = newCamX;
-      target.x = newTargetX;
+      controls.target.x = newTargetX;
     }
   }
 
@@ -148,7 +180,6 @@ function animate() {
     leaf.material.color.copy(currentColor).lerp(nextColor, blend);
   });
 
-  camera.lookAt(target);
   renderer.render(scene, camera);
 }
 animate();
