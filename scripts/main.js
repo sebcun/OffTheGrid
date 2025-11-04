@@ -199,3 +199,9 @@ window.addEventListener("resize", () => {
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth, window.innerHeight);
 });
+const buildButton = document.getElementById("build-button");
+const buildMenu = document.getElementById("build-menu");
+
+buildButton.addEventListener("click", () => {
+  buildMenu.classList.toggle("hidden");
+});
