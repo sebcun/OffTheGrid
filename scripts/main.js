@@ -3,8 +3,9 @@ console.log("loading: main.js");
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { generateForest, seasons } from "./ForestGenerator";
-import { balances, saveBalances, updateBalancesDisplay } from "./Balances";
-
+import { updateBalancesDisplay } from "./Balances";
+import { initUI } from "./UI";
+import { initPlacement } from "./Placement";
 updateBalancesDisplay();
 
 // Scene Setup
@@ -192,16 +193,12 @@ function animate() {
   renderer.render(scene, camera);
 }
 animate();
+initUI();
+initPlacement(scene, camera, ground);
 
 // Resizer
 window.addEventListener("resize", () => {
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth, window.innerHeight);
-});
-const buildButton = document.getElementById("build-button");
-const buildMenu = document.getElementById("build-menu");
-
-buildButton.addEventListener("click", () => {
-  buildMenu.classList.toggle("hidden");
 });

@@ -15,3 +15,28 @@ export function updateBalancesDisplay() {
   if (woodEl) woodEl.textContent = balances.wood;
   if (stoneEl) stoneEl.textContent = balances.stone;
 }
+
+export function parsePrice(priceStr) {
+  const price = {};
+  const parts = priceStr.split("|");
+  parts.forEach((part) => {
+    const match = part.match(/(\d+)(wood|stone)/);
+    if (match) {
+      price[match[2]] = parseInt(match[1]);
+    }
+  });
+  return price;
+}
+
+export function canAfford(price) {
+  return (
+    (price.wood || 0) <= balances.wood && (price.stone || 0) <= balances.stone
+  );
+}
+
+export function deductPrice(price) {
+  balances.wood -= price.wood || 0;
+  balances.stone -= price.stone || 0;
+  saveBalances();
+  updateBalancesDisplay();
+}
