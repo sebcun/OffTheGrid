@@ -106,7 +106,7 @@ canvas {
   transition: background-color 0.3s, border-color 0.3s, color 0.3s;
 }
 
-.bottom-bar-category.select {
+.bottom-bar-category.selected {
   background-color: #554035;
   color: #e0d3cc;
   font-weight: 800;
@@ -117,6 +117,91 @@ canvas {
   color: #e0d3cc;
 }
 
-.bottom-bar-category.select:hover {
+.bottom-bar-category.selected:hover {
   background-color: #4a352a;
+}
+.bottom-bar-category-items {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding-left: 10px;
+}
+
+.item {
+  width: 80px;
+  height: 80px;
+  background-color: #c4b5a5;
+  border: 2px solid #8b7355;
+  border-radius: 4px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3),
+    inset 0 1px 2px rgba(255, 255, 255, 0.2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+
+.item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4),
+    inset 0 1px 2px rgba(255, 255, 255, 0.3);
+}
+
+.item img {
+  width: 40px;
+  height: 40px;
+  margin-bottom: 4px;
+}
+
+.item .title {
+  font-size: 12px;
+  font-weight: 700;
+  color: #4a3c2b;
+  text-align: center;
+  line-height: 1.2;
+}
+
+.item .hover {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  font-size: 12px;
+  text-align: center;
+  padding: 2px;
+  opacity: 0;
+  transition: opacity 0.2s;
+  pointer-events: none;
+}
+
+.item:hover .hover {
+  opacity: 1;
+}
+
+.price {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #4a3c2b;
+  margin-top: 2px;
+}
+
+.price img {
+  width: 12px;
+  height: 12px;
+}
+
+.price span {
+  margin-left: 2px;
 }

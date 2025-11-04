@@ -29,12 +29,45 @@
       </div>
       <div id="bottom-bar">
         <div id="bottom-bar-categories">
-          <div class="bottom-bar-category select">Farms</div>
+          <div class="bottom-bar-category selected">Farms</div>
           <div class="bottom-bar-category">Paths</div>
           <div class="bottom-bar-category">Power</div>
         </div>
 
-        <div id="bottom-bar-insides"></div>
+        <div id="bottom-bar-insides">
+          <div class="bottom-bar-category-items" id="category-farms">
+            <div class="item" data-price="5wood|10stone" data-id="woodfarm">
+              <img src="img/wood.png" />
+              <span class="title">Wood Farm</span>
+
+              <span class="hover">+5 wood/p second</span>
+              <div class="price">
+                <img src="img/wood.png" /> <span>5</span>
+                <img src="img/stone.png" /> <span>10</span>
+              </div>
+            </div>
+            <div class="item" data-price="5wood|10stone" data-id="woodfarm">
+              <img src="img/stone.png" />
+              <span class="title">Stone Farm</span>
+
+              <span class="hover">+5 stone/p second</span>
+              <div class="price">
+                <img src="img/wood.png" /> <span>5</span>
+                <img src="img/stone.png" /> <span>10</span>
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="bottom-bar-category-items hidden"
+            id="category-paths"
+          ></div>
+
+          <div
+            class="bottom-bar-category-items hidden"
+            id="category-power"
+          ></div>
+        </div>
       </div>
     </div>
     <script type="module" src="scripts/main.js"></script>
