@@ -11,12 +11,7 @@ export function saveBalances() {
 export function updateBalancesDisplay() {
   const woodEl = document.getElementById("wood-balance");
   const stoneEl = document.getElementById("stone-balance");
-  const woodSlot = document.getElementById("wood-slot");
-  const stoneSlot = document.getElementById("stone-slot");
 
   if (woodEl) woodEl.textContent = balances.wood;
   if (stoneEl) stoneEl.textContent = balances.stone;
-
-  if (woodSlot) woodSlot.style.display = balances.wood > 0 ? "flex" : "none";
-  if (stoneSlot) stoneSlot.style.display = balances.stone > 0 ? "flex" : "none";
 }

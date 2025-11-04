@@ -5,10 +5,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Off The Grid</title>
     <link rel="stylesheet" href="styles/main.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
   </head>
   <body>
     <canvas id="gameCanvas"></canvas>
-    <div id="ui"></div>
+    <div id="ui">
+      <div id="top-bar">
+        <div id="top-bar-insides">
+          <div class="top-bar-item">
+            <img src="img/stone.png" />
+            <span id="stone-balance">0</span> Stone
+          </div>
+          <div class="top-bar-item">
+            <img src="img/wood.png" />
+            <span id="wood-balance">0</span> Wood
+          </div>
+        </div>
+      </div>
+    </div>
     <script type="module" src="scripts/main.js"></script>
   </body>
 </html>

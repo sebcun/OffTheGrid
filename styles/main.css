@@ -5,6 +5,7 @@ body {
   overflow: hidden;
   width: 100%;
   height: 100%;
+  font-family: "Montserrat", sans-serif;
 }
 
 canvas {
@@ -15,4 +16,46 @@ canvas {
 
 #ui {
   z-index: 1000;
+}
+
+#top-bar {
+  position: absolute;
+  background-color: #554035;
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
+  left: 50%;
+  top: 0px;
+  width: 800px;
+  height: 67px;
+  transform: translateX(-50%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+#top-bar-insides {
+  width: 780px;
+  height: 47px;
+  border-radius: 5px;
+  background-color: #e0d3cc;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+}
+
+.top-bar-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #6d6059;
+}
+
+.top-bar-item img {
+  width: 20px;
+  height: 20px;
 }
