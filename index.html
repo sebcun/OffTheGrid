@@ -8,43 +8,7 @@
   </head>
   <body>
     <canvas id="gameCanvas"></canvas>
-    <div id="ui">
-      <div id="hotbar">
-        <div class="slot wood-slot" id="wood-slot">
-          <img src="img/wood.png" alt="Wood" class="item-icon" />
-          <div class="stack-amount" id="wood-balance">0</div>
-        </div>
-        <div class="slot stone-slot" id="stone-slot">
-          <img src="img/stone.png" alt="Stone" class="item-icon" />
-          <div class="stack-amount" id="stone-balance">0</div>
-        </div>
-      </div>
-      <div id="build-container">
-        <button class="build-button" id="build-button">
-          <img src="img/build.png" alt="Build" class="item-icon" />
-        </button>
-      </div>
-      <div id="build-menu" class="">
-        <div class="tabs">
-          <div class="tab active" data-category="shelter">Farms</div>
-
-          <div class="tab" data-category="power">Power</div>
-        </div>
-        <div class="items-container">
-          <div class="category-items" id="shelter-items">
-            <div
-              class="build-item"
-              data-desc="A basic wood farm."
-              data-price="10 Wood | 5 Stone"
-            >
-              <span alt="Tent" class="item-icon">🪓</span>
-              Wood
-            </div>
-          </div>
-          <div class="category-items hidden" id="power-items"></div>
-        </div>
-      </div>
-    </div>
+    <div id="ui"></div>
     <script type="module" src="scripts/main.js"></script>
   </body>
 </html>
