@@ -5,7 +5,8 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { generateForest, seasons } from "./ForestGenerator";
 import { updateBalancesDisplay } from "./Balances";
 import { initUI } from "./UI";
-import { initPlacement } from "./Placement";
+import { initPlacement, placedItems, getMeshCreator } from "./Placement";
+import { loadPlacedItems } from "./SaveManager";
 updateBalancesDisplay();
 
 // Scene Setup
@@ -89,6 +90,18 @@ window.addEventListener("keyup", (e) => {
   const key = e.key.toLowerCase();
   if (key in keys) {
     keys[key] = false;
+  }
+});
+
+// Load saved items
+const loadedItems = loadPlacedItems();
+loadedItems.forEach((item) => {
+  const meshCreator = getMeshCreator(item.type);
+  if (meshCreator) {
+    const mesh = meshCreator(0x00ff00);
+    mesh.position.set(item.x, 0, item.z);
+    scene.add(mesh);
+    placedItems.push(item);
   }
 });
 

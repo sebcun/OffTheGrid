@@ -1,9 +1,10 @@
 import { selectedItem, setSelectedItem } from "./UI.js";
 import { parsePrice, canAfford, deductPrice } from "./Balances.js";
+import { savePlacedItems } from "./SaveManager.js";
 import * as THREE from "three";
 
 let previewMesh = null;
-const placedItems = [];
+export const placedItems = [];
 const raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2();
 
@@ -60,7 +61,7 @@ function createStoneFarmMesh(color) {
   return group;
 }
 
-function getMeshCreator(selectedItem) {
+export function getMeshCreator(selectedItem) {
   switch (selectedItem) {
     case "woodfarm":
       return createWoodFarmMesh;
@@ -69,6 +70,10 @@ function getMeshCreator(selectedItem) {
     default:
       return null;
   }
+}
+
+function isPositionFree(x, z) {
+  return !placedItems.some((item) => item.x === x && item.z === z);
 }
 
 export function initPlacement(scene, camera, ground) {
@@ -135,11 +140,16 @@ export function initPlacement(scene, camera, ground) {
         const itemEl = document.querySelector(`[data-id="${selectedItem}"]`);
         const price = parsePrice(itemEl.dataset.price);
         if (canAfford(price)) {
+          if (!isPositionFree(x, z)) {
+            console.log("Position already occupied");
+            return;
+          }
           deductPrice(price);
           const farmMesh = meshCreator(0x00ff00);
           farmMesh.position.set(x, 0, z);
           scene.add(farmMesh);
-          placedItems.push(farmMesh);
+          placedItems.push({ type: selectedItem, x, z });
+          savePlacedItems(placedItems);
 
           setSelectedItem(null);
           if (previewMesh) {
