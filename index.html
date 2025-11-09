@@ -40,6 +40,34 @@
         <div id="bottom-bar-insides"></div>
       </div>
     </div>
+    <div
+      id="tutorial-modal"
+      class="tutorial-modal hidden"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="tutorial-title"
+    >
+      <div class="tutorial-content" role="document">
+        <h2 id="tutorial-title">Welcome to Off The Grid</h2>
+        <p>
+          You are living off the grid. Move with <strong>W/A/S/D</strong>. Use
+          the bottom bar to pick items and press <strong>B</strong> to build.
+          Press <strong>ESC</strong> to cancel building. Press
+          <strong>H</strong> to hunt.
+        </p>
+        <p>
+          Place farms and power to generate resources. Watch your food and keep
+          your player fed.
+        </p>
+        <label class="tutorial-checkbox">
+          <input type="checkbox" id="tutorial-dont-show" />
+          Don't show this again
+        </label>
+        <div class="tutorial-actions">
+          <button id="tutorial-close" class="btn">Got it</button>
+        </div>
+      </div>
+    </div>
     <script type="module" src="scripts/main.js"></script>
   </body>
 </html>

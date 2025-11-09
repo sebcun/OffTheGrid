@@ -22,6 +22,7 @@ import { loadPlacedItems, savePlacedItems } from "./SaveManager";
 import { items } from "./config.js";
 import { populateShop } from "./Shop.js";
 import { modelCreators } from "./Models.js";
+import { showTutorialIfNeeded } from "./Tutorial.js";
 updateBalancesDisplay();
 
 const scene = new THREE.Scene();
@@ -684,6 +685,7 @@ animate();
 populateShop();
 initUI();
 initPlacement(scene, camera, ground);
+showTutorialIfNeeded();
 
 window.addEventListener("resize", () => {
   camera.aspect = window.innerWidth / window.innerHeight;
