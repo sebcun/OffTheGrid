@@ -67,8 +67,30 @@ export function createDirtPathMesh(color) {
   return mesh;
 }
 
+export function createCampfireMesh(color) {
+  const group = new THREE.Group();
+
+  const logGeometry = new THREE.CylinderGeometry(0.1, 0.1, 1, 8);
+  const logMaterial = new THREE.MeshBasicMaterial({ color: 0x8b4513 });
+  for (let i = 0; i < 3; i++) {
+    const log = new THREE.Mesh(logGeometry, logMaterial);
+    log.position.set((i - 1) * 0.3, 0, 0);
+    log.rotation.z = Math.PI / 2;
+    group.add(log);
+  }
+
+  const fireGeometry = new THREE.ConeGeometry(0.3, 0.5, 6);
+  const fireMaterial = new THREE.MeshBasicMaterial({ color: 0xff4500 });
+  const fire = new THREE.Mesh(fireGeometry, fireMaterial);
+  fire.position.set(0, 0.5, 0);
+  group.add(fire);
+
+  return group;
+}
+
 export const modelCreators = {
   woodfarm: createWoodFarmMesh,
   stonefarm: createStoneFarmMesh,
   dirtpath: createDirtPathMesh,
+  campfire: createCampfireMesh,
 };

@@ -101,6 +101,26 @@ loadedItems.forEach((item) => {
   }
 });
 
+const icons = new Map();
+
+function getPoweredPositions() {
+  const powered = new Set();
+  placedItems.forEach((item) => {
+    const itemConfig = items[item.type];
+    if (itemConfig.category === "Energy") {
+      const radius = itemConfig.radius || 0;
+      for (let dx = -radius; dx <= radius; dx++) {
+        for (let dz = -radius; dz <= radius; dz++) {
+          const px = item.x + dx;
+          const pz = item.z + dz;
+          powered.add(`${px},${pz}`);
+        }
+      }
+    }
+  });
+  return powered;
+}
+
 let lastResourceUpdate = Date.now();
 
 function animate() {
@@ -109,13 +129,43 @@ function animate() {
   controls.update();
 
   const now = Date.now();
+  const powered = getPoweredPositions();
+
+  placedItems.forEach((item) => {
+    const itemConfig = items[item.type];
+    if (itemConfig.category === "Farms") {
+      const posKey = `${item.x},${item.z}`;
+      if (!powered.has(posKey)) {
+        if (!icons.has(posKey)) {
+          const iconGeometry = new THREE.PlaneGeometry(0.5, 0.5);
+          const iconMaterial = new THREE.MeshBasicMaterial({
+            color: 0xff0000,
+            transparent: true,
+          });
+          const icon = new THREE.Mesh(iconGeometry, iconMaterial);
+          icon.position.set(item.x, 2, item.z);
+          scene.add(icon);
+          icons.set(posKey, icon);
+        }
+      } else {
+        if (icons.has(posKey)) {
+          scene.remove(icons.get(posKey));
+          icons.delete(posKey);
+        }
+      }
+    }
+  });
+
   if (now - lastResourceUpdate >= 1000) {
     const resourcesToAdd = { wood: 0, stone: 0 };
     placedItems.forEach((item) => {
       const itemConfig = items[item.type];
       if (itemConfig && itemConfig.rate) {
-        resourcesToAdd.wood += itemConfig.rate.wood || 0;
-        resourcesToAdd.stone += itemConfig.rate.stone || 0;
+        const posKey = `${item.x},${item.z}`;
+        if (powered.has(posKey)) {
+          resourcesToAdd.wood += itemConfig.rate.wood || 0;
+          resourcesToAdd.stone += itemConfig.rate.stone || 0;
+        }
       }
     });
     addResources(resourcesToAdd);

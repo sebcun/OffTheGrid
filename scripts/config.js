@@ -25,4 +25,13 @@ export const items = {
     model: "dirtpath",
     image: "img/dirt.png",
   },
+  campfire: {
+    name: "Campfire",
+    category: "Energy",
+    price: { wood: 5, stone: 0 },
+    description: "its a campfire",
+    radius: 5,
+    model: "campfire",
+    image: "img/dirt.png",
+  },
 };
