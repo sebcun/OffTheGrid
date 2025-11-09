@@ -93,7 +93,9 @@ loadedItems.forEach((item) => {
   const meshCreator = getMeshCreator(item.type);
   if (meshCreator) {
     const mesh = meshCreator(0x00ff00);
-    mesh.position.set(item.x, 0, item.z);
+    let yPos = 0;
+    if (item.type === "dirtpath") yPos = 0.02;
+    mesh.position.set(item.x, yPos, item.z);
     scene.add(mesh);
     placedItems.push(item);
   }
@@ -215,7 +217,6 @@ function animate() {
 }
 animate();
 populateShop();
-
 initUI();
 initPlacement(scene, camera, ground);
 

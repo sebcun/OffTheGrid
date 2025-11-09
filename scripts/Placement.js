@@ -46,7 +46,9 @@ export function initPlacement(scene, camera, ground) {
             }
           });
 
-          previewMesh.position.set(x, 0, z);
+          let yPos = 0;
+          if (selectedItem === "dirtpath") yPos = 0.02;
+          previewMesh.position.set(x, yPos, z);
         } else {
           if (previewMesh) {
             scene.remove(previewMesh);
@@ -87,7 +89,9 @@ export function initPlacement(scene, camera, ground) {
           }
           deductPrice(price);
           const farmMesh = meshCreator(0x00ff00);
-          farmMesh.position.set(x, 0, z);
+          let yPos = 0;
+          if (selectedItem === "dirtpath") yPos = 0.02;
+          farmMesh.position.set(x, yPos, z);
           scene.add(farmMesh);
           placedItems.push({ type: selectedItem, x, z });
           savePlacedItems(placedItems);

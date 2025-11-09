@@ -63,6 +63,7 @@ export function createDirtPathMesh(color) {
   const geometry = new THREE.PlaneGeometry(1, 1);
   const mesh = new THREE.Mesh(geometry, solidMaterial);
   mesh.rotation.x = -Math.PI / 2;
+  mesh.position.y = 10;
   return mesh;
 }
 
