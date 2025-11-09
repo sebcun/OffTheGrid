@@ -49,6 +49,8 @@ export const seasons = [
   springMaterials,
 ];
 
+export const forestBlockedPositions = new Set();
+
 export function generateForest(scene, seasonIndex) {
   const trunkMaterials = [
     new THREE.MeshBasicMaterial({ color: 0x4b2e05 }),
@@ -76,7 +78,12 @@ export function generateForest(scene, seasonIndex) {
           trunkMaterial
         );
         trunk.position.set(randX, trunkHeight / 2, randZ);
+        trunk.userData.isForest = true;
         scene.add(trunk);
+
+        const blockedX = Math.round(randX - 0.5) + 0.5;
+        const blockedZ = Math.round(randZ - 0.5) + 0.5;
+        forestBlockedPositions.add(`${blockedX},${blockedZ}`);
 
         const leafSize = 0.5 + Math.random() * 1;
         const leafIndex = Math.floor(Math.random() * 7);
@@ -87,6 +94,7 @@ export function generateForest(scene, seasonIndex) {
         );
         leaves.position.set(randX, trunkHeight + leafSize / 2, randZ);
         leaves.userData.leafIndex = leafIndex;
+        leaves.userData.isForest = true;
         scene.add(leaves);
         leafMeshes.push(leaves);
       }

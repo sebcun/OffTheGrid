@@ -15,6 +15,7 @@ import {
   placedItems,
   getMeshCreator,
   isPositionFree,
+  isWalkable,
 } from "./Placement";
 import { loadPlacedItems, savePlacedItems } from "./SaveManager";
 import { items } from "./config.js";
@@ -188,21 +189,33 @@ window.addEventListener("keydown", (e) => {
       if (key === "w") {
         const dx = Math.round(-Math.sin(playerRotation));
         const dz = Math.round(-Math.cos(playerRotation));
-        playerGrid.x += dx;
-        playerGrid.y += dz;
-        targetPosition.set(playerGrid.x + 0.5, 0, playerGrid.y + 0.5);
-        moving = true;
-        moveStartTime = Date.now();
-        startPosition.copy(player.position);
+        const candidateGridX = playerGrid.x + dx;
+        const candidateGridY = playerGrid.y + dz;
+        const worldX = candidateGridX + 0.5;
+        const worldZ = candidateGridY + 0.5;
+        if (isWalkable(worldX, worldZ)) {
+          playerGrid.x = candidateGridX;
+          playerGrid.y = candidateGridY;
+          targetPosition.set(worldX, 0, worldZ);
+          moving = true;
+          moveStartTime = Date.now();
+          startPosition.copy(player.position);
+        }
       } else if (key === "s") {
         const dx = Math.round(Math.sin(playerRotation));
         const dz = Math.round(Math.cos(playerRotation));
-        playerGrid.x += dx;
-        playerGrid.y += dz;
-        targetPosition.set(playerGrid.x + 0.5, 0, playerGrid.y + 0.5);
-        moving = true;
-        moveStartTime = Date.now();
-        startPosition.copy(player.position);
+        const candidateGridX = playerGrid.x + dx;
+        const candidateGridY = playerGrid.y + dz;
+        const worldX = candidateGridX + 0.5;
+        const worldZ = candidateGridY + 0.5;
+        if (isWalkable(worldX, worldZ)) {
+          playerGrid.x = candidateGridX;
+          playerGrid.y = candidateGridY;
+          targetPosition.set(worldX, 0, worldZ);
+          moving = true;
+          moveStartTime = Date.now();
+          startPosition.copy(player.position);
+        }
       } else if (key === "a") {
         targetRotation = playerRotation - Math.PI / 2;
         rotating = true;
