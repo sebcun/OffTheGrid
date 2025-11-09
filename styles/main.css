@@ -63,6 +63,18 @@ canvas {
   height: 20px;
 }
 
+#build-instruction {
+  position: absolute;
+  top: 77px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 700;
+  text-align: center;
+  z-index: 1001;
+}
+
 #bottom-bar {
   position: absolute;
   background-color: #554035;

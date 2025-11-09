@@ -123,14 +123,10 @@ export function initPlacement(scene, camera, ground) {
           placedItems.push({ type: selectedItem, x, z });
           savePlacedItems(placedItems);
 
-          setSelectedItem(null);
           if (previewMesh) {
             scene.remove(previewMesh);
             previewMesh = null;
           }
-          document
-            .querySelectorAll(".item")
-            .forEach((i) => i.classList.remove("selected"));
         } else {
           console.log("Not enough resources");
         }
