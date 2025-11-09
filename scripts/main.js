@@ -3,17 +3,17 @@ console.log("loading: main.js");
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { generateForest, seasons } from "./ForestGenerator";
-import { updateBalancesDisplay } from "./Balances";
+import { updateBalancesDisplay, addResources } from "./Balances";
 import { initUI } from "./UI";
 import { initPlacement, placedItems, getMeshCreator } from "./Placement";
 import { loadPlacedItems } from "./SaveManager";
+import { items } from "./config.js";
+import { populateShop } from "./Shop.js";
 updateBalancesDisplay();
 
-// Scene Setup
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x87ceeb);
 
-// Camera
 const camera = new THREE.PerspectiveCamera(
   75,
   window.innerWidth / window.innerHeight,
@@ -25,7 +25,6 @@ const target = new THREE.Vector3(0, 0, 0);
 camera.lookAt(target);
 const up = new THREE.Vector3(0, 1, 0);
 
-// Renderer
 const renderer = new THREE.WebGLRenderer({
   canvas: document.getElementById("gameCanvas"),
   antialias: false,
@@ -33,7 +32,6 @@ const renderer = new THREE.WebGLRenderer({
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-// Controls
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.target.copy(target);
 controls.enableDamping = true;
@@ -53,7 +51,6 @@ controls.addEventListener("change", () => {
   }
 });
 
-// Grid/Floor
 const planeGeometry = new THREE.PlaneGeometry(100, 100);
 const planeMaterial = new THREE.MeshBasicMaterial({ color: 0x228b22 });
 
@@ -67,13 +64,11 @@ scene.add(gridHelper);
 
 const leafMeshes = generateForest(scene, 0);
 
-// Seasons
 let currentSeasonIndex = 0;
 let nextSeasonIndex = 1;
 let transitionStart = Date.now();
 const transitionDuration = 60000;
 
-// WASD Movement
 const keys = { w: false, a: false, s: false, d: false };
 const moveSpeed = 0.1;
 const zoomSpeed = 0.1;
@@ -93,7 +88,6 @@ window.addEventListener("keyup", (e) => {
   }
 });
 
-// Load saved items
 const loadedItems = loadPlacedItems();
 loadedItems.forEach((item) => {
   const meshCreator = getMeshCreator(item.type);
@@ -105,11 +99,26 @@ loadedItems.forEach((item) => {
   }
 });
 
-// Animate Loop
+let lastResourceUpdate = Date.now();
+
 function animate() {
   requestAnimationFrame(animate);
 
   controls.update();
+
+  const now = Date.now();
+  if (now - lastResourceUpdate >= 1000) {
+    const resourcesToAdd = { wood: 0, stone: 0 };
+    placedItems.forEach((item) => {
+      const itemConfig = items[item.type];
+      if (itemConfig && itemConfig.rate) {
+        resourcesToAdd.wood += itemConfig.rate.wood || 0;
+        resourcesToAdd.stone += itemConfig.rate.stone || 0;
+      }
+    });
+    addResources(resourcesToAdd);
+    lastResourceUpdate = now;
+  }
 
   const forward = new THREE.Vector3()
     .subVectors(controls.target, camera.position)
@@ -185,13 +194,12 @@ function animate() {
     }
   }
 
-  // Seasons
-  const now = Date.now();
-  let blend = (now - transitionStart) / transitionDuration;
+  const nowSeason = Date.now();
+  let blend = (nowSeason - transitionStart) / transitionDuration;
   if (blend >= 1) {
     currentSeasonIndex = nextSeasonIndex;
     nextSeasonIndex = (nextSeasonIndex + 1) % 4;
-    transitionStart = now;
+    transitionStart = nowSeason;
     blend = 0;
   }
   leafMeshes.forEach((leaf) => {
@@ -206,10 +214,11 @@ function animate() {
   renderer.render(scene, camera);
 }
 animate();
+populateShop();
+
 initUI();
 initPlacement(scene, camera, ground);
 
-// Resizer
 window.addEventListener("resize", () => {
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();

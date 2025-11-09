@@ -40,3 +40,10 @@ export function deductPrice(price) {
   saveBalances();
   updateBalancesDisplay();
 }
+
+export function addResources(resources) {
+  balances.wood += resources.wood || 0;
+  balances.stone += resources.stone || 0;
+  saveBalances();
+  updateBalancesDisplay();
+}

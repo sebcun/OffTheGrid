@@ -17,6 +17,9 @@ canvas {
 #ui {
   z-index: 1000;
 }
+.hidden {
+  display: none !important;
+}
 
 #top-bar {
   position: absolute;

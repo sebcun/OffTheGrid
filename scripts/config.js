@@ -1,0 +1,28 @@
+export const items = {
+  woodfarm: {
+    name: "Wood Farm",
+    category: "Farms",
+    price: { wood: 30, stone: 10 },
+    description: "+5 wood per second",
+    rate: { wood: 5 },
+    model: "woodfarm",
+    image: "img/wood.png",
+  },
+  stonefarm: {
+    name: "Stone Farm",
+    category: "Farms",
+    price: { wood: 10, stone: 30 },
+    description: "+5 stone per second",
+    rate: { stone: 5 },
+    model: "stonefarm",
+    image: "img/stone.png",
+  },
+  dirtpath: {
+    name: "Dirt Path",
+    category: "Paths",
+    price: { wood: 5, stone: 0 },
+    description: "its a dirt path",
+    model: "dirtpath",
+    image: "img/dirt.png",
+  },
+};
