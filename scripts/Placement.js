@@ -9,6 +9,12 @@ export const placedItems = [];
 const raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2();
 
+let mouseDown = false;
+let dragStarted = false;
+const dragThreshold = 5;
+let mouseStartX = 0;
+let mouseStartY = 0;
+
 export function getMeshCreator(selectedItem) {
   return modelCreators[selectedItem] || null;
 }
@@ -20,7 +26,28 @@ function isPositionFree(x, z) {
 export function initPlacement(scene, camera, ground) {
   const canvas = document.getElementById("gameCanvas");
 
+  canvas.addEventListener("mousedown", (event) => {
+    if (selectedItem) {
+      mouseDown = true;
+      dragStarted = false;
+      mouseStartX = event.clientX;
+      mouseStartY = event.clientY;
+    }
+  });
+
+  canvas.addEventListener("mouseup", () => {
+    mouseDown = false;
+  });
+
   canvas.addEventListener("mousemove", (event) => {
+    if (mouseDown && selectedItem && !dragStarted) {
+      const dx = event.clientX - mouseStartX;
+      const dy = event.clientY - mouseStartY;
+      if (Math.sqrt(dx * dx + dy * dy) > dragThreshold) {
+        dragStarted = true;
+      }
+    }
+
     mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
     mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
     raycaster.setFromCamera(mouse, camera);
@@ -65,7 +92,7 @@ export function initPlacement(scene, camera, ground) {
   });
 
   canvas.addEventListener("click", (event) => {
-    if (selectedItem) {
+    if (selectedItem && !dragStarted) {
       const meshCreator = getMeshCreator(selectedItem);
       if (!meshCreator) {
         console.log("Invalid item selected");
@@ -109,5 +136,6 @@ export function initPlacement(scene, camera, ground) {
         }
       }
     }
+    dragStarted = false;
   });
 }
