@@ -8,6 +8,7 @@ import {
   parsePrice,
   canAfford,
   deductPrice,
+  balances,
 } from "./Balances";
 import { initUI, selectedItem, setSelectedItem } from "./UI";
 import {
@@ -20,6 +21,7 @@ import {
 import { loadPlacedItems, savePlacedItems } from "./SaveManager";
 import { items } from "./config.js";
 import { populateShop } from "./Shop.js";
+import { modelCreators } from "./Models.js";
 updateBalancesDisplay();
 
 const scene = new THREE.Scene();
@@ -138,6 +140,7 @@ const keys = {
   b: false,
   r: false,
   escape: false,
+  h: false,
 };
 
 let moving = false;
@@ -278,6 +281,7 @@ window.addEventListener("keydown", (e) => {
         const refund = {
           wood: Math.round((cfg.price.wood || 0) * 0.7),
           stone: Math.round((cfg.price.stone || 0) * 0.7),
+          food: Math.round((cfg.price.food || 0) * 0.7),
         };
         addResources(refund);
         const meshIndex = scene.children.findIndex((child) => {
@@ -308,6 +312,22 @@ window.addEventListener("keydown", (e) => {
         }
         placedItems.splice(idx, 1);
         savePlacedItems(placedItems);
+      } else if (key === "h") {
+        // hunt/harvest animals at player position
+        const x = Math.round(player.position.x * 100) / 100;
+        const z = Math.round(player.position.z * 100) / 100;
+        const animalIdx = animals.findIndex(
+          (a) => Math.abs(a.x - x) < 0.1 && Math.abs(a.z - z) < 0.1
+        );
+        if (animalIdx !== -1) {
+          const a = animals[animalIdx];
+          scene.remove(a.mesh);
+          animals.splice(animalIdx, 1);
+          addResources({ food: 5 });
+          console.log("You hunted an animal and gained 5 food");
+        } else {
+          console.log("No animal to hunt here");
+        }
       } else if (key === "escape") {
         setSelectedItem(null);
       }
@@ -403,6 +423,100 @@ function getPoweredPositions() {
 
 let lastResourceUpdate = Date.now();
 
+// hunger/player food consumption system
+let playerHunger = 100; // 0-100
+let lastHungerUpdate = Date.now();
+const hungerInterval = 5000; // ms
+const hungerConsumePerMeal = 1; // food units consumed when eating
+const hungerGainPerMeal = 30; // hunger points restored per food unit
+const hungerDecayNoFood = 10; // hunger points lost when no food available per interval
+
+// animals system
+const animals = [];
+const maxAnimals = 8;
+const animalSpawnInterval = 12000;
+let lastAnimalSpawn = Date.now();
+
+function spawnAnimal() {
+  // pick random free position within -10..10
+  for (let attempts = 0; attempts < 20; attempts++) {
+    const gx = Math.floor(Math.random() * 21) - 10;
+    const gz = Math.floor(Math.random() * 21) - 10;
+    const x = gx + 0.5;
+    const z = gz + 0.5;
+    // avoid forest blocked and occupied
+    if (!isPositionFree(x, z)) continue;
+    // create animal
+    const mesh = modelCreators.animal(0xffaa66);
+    mesh.position.set(x, 0, z);
+    mesh.userData = { kind: "animal" };
+    scene.add(mesh);
+    animals.push({
+      id: Date.now() + Math.random(),
+      x,
+      z,
+      mesh,
+      targetX: x,
+      targetZ: z,
+      moveStart: Date.now(),
+      moveDuration: 1000 + Math.random() * 2000,
+      startX: mesh.position.x,
+      startZ: mesh.position.z,
+    });
+    break;
+  }
+}
+
+function updateAnimals() {
+  animals.forEach((a) => {
+    // occasionally pick a new nearby target
+    if (Date.now() - a.moveStart > a.moveDuration) {
+      const dx = Math.floor(Math.random() * 3) - 1;
+      const dz = Math.floor(Math.random() * 3) - 1;
+      let nx = a.x + dx;
+      let nz = a.z + dz;
+      // clamp to -10..10 area
+      nx = Math.max(-10.5, Math.min(10.5, nx));
+      nz = Math.max(-10.5, Math.min(10.5, nz));
+      // avoid occupied by placed items
+      if (isPositionFree(nx, nz)) {
+        a.targetX = nx;
+        a.targetZ = nz;
+        // use current mesh position as the movement start to avoid snapping
+        a.startX = a.mesh.position.x;
+        a.startZ = a.mesh.position.z;
+        a.moveStart = Date.now();
+        a.moveDuration = 1000 + Math.random() * 2000;
+      } else {
+        // delay a bit and try again
+        a.moveStart = Date.now() + 500;
+      }
+    } else {
+      const t = Math.min((Date.now() - a.moveStart) / a.moveDuration, 1);
+      const sx = a.startX !== undefined ? a.startX : a.mesh.position.x;
+      const sz = a.startZ !== undefined ? a.startZ : a.mesh.position.z;
+      const nx = sx + (a.targetX - sx) * t;
+      const nz = sz + (a.targetZ - sz) * t;
+      a.mesh.position.set(nx, 0, nz);
+      if (t >= 1) {
+        // update logical position to match mesh exactly
+        a.x = a.mesh.position.x;
+        a.z = a.mesh.position.z;
+        a.startX = undefined;
+        a.startZ = undefined;
+      }
+    }
+  });
+}
+
+function removeOffscreenAnimals() {
+  // nothing for now; animals are limited by maxAnimals
+}
+
+function countAnimals() {
+  return animals.length;
+}
+
 function animate() {
   requestAnimationFrame(animate);
 
@@ -431,20 +545,49 @@ function animate() {
   });
 
   if (now - lastResourceUpdate >= 1000) {
-    const resourcesToAdd = { wood: 0, stone: 0 };
+    const resourcesToAdd = {};
     placedItems.forEach((item) => {
       const itemConfig = items[item.type];
       if (itemConfig && itemConfig.rate) {
         const posKey = `${item.x},${item.z}`;
         if (powered.has(posKey)) {
-          resourcesToAdd.wood += itemConfig.rate.wood || 0;
-          resourcesToAdd.stone += itemConfig.rate.stone || 0;
+          for (const k in itemConfig.rate) {
+            resourcesToAdd[k] = (resourcesToAdd[k] || 0) + itemConfig.rate[k];
+          }
         }
       }
     });
     addResources(resourcesToAdd);
     lastResourceUpdate = now;
   }
+
+  // hunger updates
+  if (now - lastHungerUpdate >= hungerInterval) {
+    if (playerHunger < 100 && balances.food > 0) {
+      // consume food to restore hunger
+      const consume = Math.min(hungerConsumePerMeal, balances.food);
+      deductPrice({ food: consume });
+      playerHunger = Math.min(100, playerHunger + consume * hungerGainPerMeal);
+    } else if (balances.food <= 0) {
+      playerHunger = Math.max(-100, playerHunger - hungerDecayNoFood);
+    } else {
+      // small natural decay
+      playerHunger = Math.max(-100, playerHunger - 2);
+    }
+    lastHungerUpdate = now;
+  }
+
+  // animal spawn
+  if (now - lastAnimalSpawn >= animalSpawnInterval) {
+    if (countAnimals() < maxAnimals) spawnAnimal();
+    lastAnimalSpawn = now;
+  }
+
+  updateAnimals();
+
+  // apply hunger effects: adjust moveDuration when hungry
+  const hungerFactor = playerHunger <= 0 ? 2.5 : playerHunger < 30 ? 1.8 : 1.0;
+  moveDuration = 0.2 * hungerFactor;
 
   if (moving) {
     const elapsed = (Date.now() - moveStartTime) / 1000;

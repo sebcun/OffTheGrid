@@ -35,11 +35,14 @@ export function populateShop() {
 
     if (categories[category]) {
       itemsDiv.innerHTML = categories[category]
-        .map(
-          (item) => `
-          <div class="item" data-price="${item.price.wood || 0}wood|${
-            item.price.stone || 0
-          }stone" data-id="${item.id}">
+        .map((item) => {
+          const parts = [];
+          if (item.price.wood) parts.push(`${item.price.wood}wood`);
+          if (item.price.stone) parts.push(`${item.price.stone}stone`);
+          if (item.price.food) parts.push(`${item.price.food}food`);
+          const priceStr = parts.join("|");
+          return `
+          <div class="item" data-price="${priceStr}" data-id="${item.id}">
             <img src="${item.image}" />
             <span class="title">${item.name}</span>
             <span class="hover">${item.description}</span>
@@ -54,10 +57,15 @@ export function populateShop() {
                   ? `<img src="img/stone.png" /> <span>${item.price.stone}</span>`
                   : ""
               }
+              ${
+                item.price.food
+                  ? `<img src="img/dirt.png" /> <span>${item.price.food}</span>`
+                  : ""
+              }
             </div>
           </div>
-        `
-        )
+        `;
+        })
         .join("");
     }
 
